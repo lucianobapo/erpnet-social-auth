@@ -43,6 +43,8 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
 
 //        include __DIR__.'/routes.php';
 
+        $this->app->register(\Collective\Html\HtmlServiceProvider::class);
+
         Form::component('customText', 'components.form.text',
             ['name', 'label' => null, 'value' => null, 'attributes' => []]);
         Form::component('customCheckbox', 'components.form.checkbox',
