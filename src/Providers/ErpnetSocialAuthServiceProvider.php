@@ -44,6 +44,7 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
 //        include __DIR__.'/routes.php';
 
         $this->app->register(\Collective\Html\HtmlServiceProvider::class);
+        $this->app->register(\Laravel\Socialite\SocialiteServiceProvider::class);
 
         Form::component('customText', 'components.form.text',
             ['name', 'label' => null, 'value' => null, 'attributes' => []]);
