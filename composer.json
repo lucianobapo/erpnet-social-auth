@@ -1,0 +1,29 @@
+{
+    "name": "ilhanet/erpnet-social-auth",
+    "license": "MIT",
+    "version": "0.0.1",
+    "authors": [
+        {
+            "name": "Luciano Porto",
+            "email": "luciano.bapo@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "laravelcollective/html": "dev-master",
+        "laravel/socialite": "^2.0",
+        "illuminate/cache": "^5.3"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "ErpNET\\SocialAuth\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ErpNET\\SocialAuthTests\\": "tests/"
+        }
+    }
+}
