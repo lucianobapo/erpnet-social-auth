@@ -31,11 +31,11 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__.'../../resources/views', 'erpnetSocialAuth');
+        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'erpnetSocialAuth');
 
         $this->publishes([
-            __DIR__.'../../config/erpnetSocialAuth.php' => config_path('erpnetSocialAuth.php'),
-            __DIR__.'../../resources/views' => base_path('resources/views/vendor/erpnetSocialAuth'),
+            __DIR__.'/../../config/erpnetSocialAuth.php' => config_path('erpnetSocialAuth.php'),
+            __DIR__.'/../../resources/views' => base_path('resources/views/vendor/erpnetSocialAuth'),
 //            __DIR__.'/Migrations' => base_path('database/migrations'),
         ]);
 
