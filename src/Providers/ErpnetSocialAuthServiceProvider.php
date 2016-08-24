@@ -35,7 +35,7 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__.'../../config/erpnetSocialAuth.php' => config_path('erpnetSocialAuth.php'),
-            __DIR__.'../../resources/views' => base_path('resources/views/erpnetSocialAuth'),
+            __DIR__.'../../resources/views' => base_path('resources/views/vendor/erpnetSocialAuth'),
 //            __DIR__.'/Migrations' => base_path('database/migrations'),
         ]);
 
