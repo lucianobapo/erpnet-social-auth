@@ -29,10 +29,10 @@ trait TraitSocialite
     {
         $driver = Socialite::driver($provider);
         if (method_exists($driver, 'fields') && is_callable([$driver, 'fields']))
-            $driver->fields(config('erpnet-social-auth.socialLogin.'.$provider.'.fields'));
+            $driver->fields(config('erpnetSocialAuth.socialLogin.'.$provider.'.fields'));
 
         if (method_exists($driver, 'scopes') && is_callable([$driver, 'scopes']))
-            $driver->scopes(config('erpnet-social-auth.socialLogin.'.$provider.'.scopes'));
+            $driver->scopes(config('erpnetSocialAuth.socialLogin.'.$provider.'.scopes'));
 
         return $driver;
     }
@@ -64,7 +64,7 @@ trait TraitSocialite
      */
     public function handleProviderCallback($provider, Request $request)
     {
-        if (array_search($provider,config('erpnet-social-auth.socialLogin.availableProviders'))===false)
+        if (array_search($provider,config('erpnetSocialAuth.socialLogin.availableProviders'))===false)
             dd($provider);
 
         $state = $request->get('state');

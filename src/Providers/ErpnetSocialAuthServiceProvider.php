@@ -31,6 +31,18 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->loadViewsFrom(__DIR__.'../../resources/views', 'erpnetSocialAuth');
+
+        $this->publishes([
+            __DIR__.'../../config/erpnetSocialAuth.php' => config_path('erpnetSocialAuth.php'),
+            __DIR__.'../../resources/views' => base_path('resources/views/erpnetSocialAuth'),
+//            __DIR__.'/Migrations' => base_path('database/migrations'),
+        ]);
+
+//        $this->app->config->set('auth.model', $this->app->config->get('easyAuthenticator.model'));
+
+//        include __DIR__.'/routes.php';
+
         Form::component('customText', 'components.form.text',
             ['name', 'label' => null, 'value' => null, 'attributes' => []]);
         Form::component('customCheckbox', 'components.form.checkbox',

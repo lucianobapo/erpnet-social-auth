@@ -1,4 +1,4 @@
-@foreach(config('erpnet-social-auth.socialLogin.availableProviders') as $provider)
+@foreach(config('erpnetSocialAuth.socialLogin.availableProviders') as $provider)
     @if($provider!='laravel')
         <div class="form-group">
             <div class="col-md-6 col-md-offset-4">
