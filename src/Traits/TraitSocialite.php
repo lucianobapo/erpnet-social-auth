@@ -82,10 +82,10 @@ trait TraitSocialite
     /**
      * processSocialUser.
      *
-     * @param $provider
-     * @param $user
+     * @param string $provider
+     * @param $socialUser
      * @param Request $request
      * @return Response
      */
-    abstract protected function processSocialUser($provider, $user, Request $request);
+    abstract protected function processSocialUser($provider, $socialUser, Request $request);
 }
