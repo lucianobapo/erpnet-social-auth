@@ -63,9 +63,9 @@ class SocialAuthController extends Controller
 
         $abstractProvider = $this->callSocialiteDriver($provider);
 //        dd($abstractProvider);
-        $user = $abstractProvider->user();
+        $socialUser = $abstractProvider->user();
 //        dd($user);
-        return $this->processSocialUser($provider, $user, $request);
+        return $this->processSocialUser($provider, $socialUser, $request);
     }
 
     /**
@@ -76,6 +76,8 @@ class SocialAuthController extends Controller
      */
     protected function processSocialUser($provider, $socialUser, Request $request)
     {
+        dd($socialUser);
+
         $userFromDatabase = $this->userService->findFirst([
             'provider_name' => $provider,
             'provider_id' => $socialUser->getId(),

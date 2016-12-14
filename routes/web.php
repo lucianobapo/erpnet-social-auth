@@ -15,6 +15,7 @@ use Illuminate\Routing\Router;
 
 $routeConfig = [
     'namespace' => 'ErpNET\SocialAuth\Controllers',
+    'middleware' => ['web'],
 ];
 
 $router = app(Router::class);
