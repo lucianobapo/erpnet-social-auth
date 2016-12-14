@@ -21,7 +21,8 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // TODO: Implement register() method.
+        $this->app->register(\Collective\Html\HtmlServiceProvider::class);
+        $this->app->register(\Laravel\Socialite\SocialiteServiceProvider::class);
     }
 
     /**
@@ -31,11 +32,17 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'erpnetSocialAuth');
+        $projectRootDir = __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
+        $routesDir = $projectRootDir."routes".DIRECTORY_SEPARATOR;
+
+        //Routing
+        include $routesDir."web.php";
+
+        $this->loadViewsFrom($projectRootDir.'resources/views', 'erpnetSocialAuth');
 
         $this->publishes([
-            __DIR__.'/../../config/erpnetSocialAuth.php' => config_path('erpnetSocialAuth.php'),
-            __DIR__.'/../../resources/views' => base_path('resources/views/vendor/erpnetSocialAuth'),
+            $projectRootDir.'config/erpnetSocialAuth.php' => config_path('erpnetSocialAuth.php'),
+            $projectRootDir.'resources/views' => base_path('resources/views/vendor/erpnetSocialAuth'),
 //            __DIR__.'/Migrations' => base_path('database/migrations'),
         ]);
 
@@ -43,8 +50,7 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
 
 //        include __DIR__.'/routes.php';
 
-        $this->app->register(\Collective\Html\HtmlServiceProvider::class);
-        $this->app->register(\Laravel\Socialite\SocialiteServiceProvider::class);
+
 
         Form::component('customText', 'components.form.text',
             ['name', 'label' => null, 'value' => null, 'attributes' => []]);
