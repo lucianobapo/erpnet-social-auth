@@ -46,7 +46,7 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
 //            __DIR__.'/Migrations' => base_path('database/migrations'),
         ]);
 
-        $this->app->config->set('services', array_merge($this->app->config->get('services'), $this->app->config->get('erpnetSocialAuth.services')));
+        $this->app->config->set('services', array_merge($this->app->config->get('services'), $this->app->config->get('erpnetSocialAuth.socialLogin.services')));
 
         Form::component('customText', 'components.form.text',
             ['name', 'label' => null, 'value' => null, 'attributes' => []]);
