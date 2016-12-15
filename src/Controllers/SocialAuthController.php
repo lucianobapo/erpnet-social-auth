@@ -96,15 +96,7 @@ class SocialAuthController extends Controller
      */
     protected function processSocialUser($provider, $socialUser, Request $request)
     {
-        $response = $this->guzzle->request('GET', config('erpnetSocialAuth.userApiUrl'), [
-            'debug' => false,
-            'query' => ['search' => $socialUser->id],
-            'headers' => [
-                'Accept'     => config('erpnetSocialAuth.userApiHeader'),
-            ]
-        ]);
-
-        if ($response->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
+        $response = $this->userApiSearch($socialUser);
 
         $responseUser = json_decode($response->getBody()->getContents());
 
@@ -114,26 +106,9 @@ class SocialAuthController extends Controller
             return $this->authenticated($request, $this->guard()->user())
                 ?: redirect()->intended($this->redirectPath());
         } elseif (isset($responseUser->data) && count($responseUser->data)==0)  {
-            $response2 = $this->guzzle->request('POST', config('erpnetSocialAuth.userApiUrl'), [
-                'debug' => false,
-                'form_params' => [
-                    'mandante' => 'ilhanet',
-                    'name' => $socialUser->name,
-                    'avatar' => $socialUser->avatar,
-                    'password' => bcrypt($socialUser->id),
-                    'username' => $socialUser->nickname,
-                    'email' => $socialUser->email,
-                    'provider' => $provider,
-                    'provider_id' => $socialUser->id,
-                ],
-                'headers' => [
-                    'Accept'     => config('erpnetSocialAuth.userApiHeader'),
-                ]
-            ]);
+            $response2 = $this->userApiCreate($provider, $socialUser);
 
-            if ($response2->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
-
-            $responseUser2 = json_decode($response->getBody()->getContents());
+            $responseUser2 = json_decode($response2->getBody()->getContents());
 
             dd($responseUser2);
 
@@ -148,5 +123,55 @@ class SocialAuthController extends Controller
 //            return redirect($this->cache->get(md5($_SERVER['REMOTE_ADDR'])));
 //        else
 //            return redirect($this->redirectPath());
+    }
+
+    /**
+     * @param $socialUser
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    protected function userApiSearch($socialUser)
+    {
+        $response = $this->guzzle->request('GET', config('erpnetSocialAuth.userApiUrl'), [
+            'debug' => false,
+            'query' => ['search' => $socialUser->id],
+            'headers' => [
+                'Accept' => config('erpnetSocialAuth.userApiHeader'),
+            ]
+        ]);
+
+        if ($response->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
+
+        return $response;
+    }
+
+    /**
+     * @param $provider
+     * @param $socialUser
+     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     */
+    protected function userApiCreate($provider, $socialUser)
+    {
+        $response = $this->guzzle->request('POST', config('erpnetSocialAuth.userApiUrl'), [
+            'debug' => false,
+            'form_params' => [
+                'mandante' => 'ilhanet',
+                'name' => $socialUser->name,
+                'avatar' => $socialUser->avatar,
+                'password' => bcrypt($socialUser->id),
+                'username' => $socialUser->nickname,
+                'email' => $socialUser->email,
+                'provider' => $provider,
+                'provider_id' => $socialUser->id,
+            ],
+            'headers' => [
+                'Accept' => config('erpnetSocialAuth.userApiHeader'),
+            ]
+        ]);
+
+        if ($response->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
+
+        return $response;
     }
 }
