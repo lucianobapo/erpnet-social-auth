@@ -2,12 +2,32 @@
 
 namespace ErpNET\SocialAuth\Controllers;
 
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Laravel\Socialite\Facades\Socialite;
+use GuzzleHttp\Client as GuzzleClient;
 
 class SocialAuthController extends Controller
 {
+    use AuthenticatesUsers;
+
+    /*
+     *
+     * @var GuzzleClient
+     */
+    protected $guzzle;
+
+    public function __construct()
+    {
+        $this->guzzle = new GuzzleClient([
+            // Base URI is used with relative requests
+//            'base_uri' => 'http://localhost:8080/',
+            // You can set any number of default request options.
+            'timeout'  => 2.0,
+        ]);
+    }
+
     /**
      * Redirect the user to the Provider authentication page.
      *
@@ -74,42 +94,30 @@ class SocialAuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    protected function processSocialUser($provider, $socialUser, Request $request)
+    protected function processSocialUser($provider, $socialUser, Request $request, GuzzleClient $client)
     {
-        dd($socialUser);
-
-        $userFromDatabase = $this->userService->findFirst([
-            'provider_name' => $provider,
-            'provider_id' => $socialUser->getId(),
+        $response = $this->guzzle->request('GET', config('erpnetSocialAuth.userApiUrl'), [
+            'debug' => false,
+            'query' => ['search' => $socialUser->id],
+            'headers' => [
+                'Accept'     => config('erpnetSocialAuth.userApiHeader'),
+            ]
         ]);
 
-        if (is_null($userFromDatabase)) {
-            $validatorSocialUser = $this->validatorSocialUser([
-                'provider_name' => $provider,
-                'provider_id' => $socialUser->getId(),
-                'email' => $socialUser->getEmail(),
-            ]);
+        if ($response->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
 
-            if ($validatorSocialUser->fails()) {
-                return redirect()->to('register')
-                    ->withErrors($validatorSocialUser->getMessageBag()->get('email'));
-            }
+        $socialUser = json_decode($response->getBody()->getContents());
 
-            $userFromDatabase = $this->userService->create([
-                'name' => $socialUser->getName(),
-                'email' => $socialUser->getEmail(),
-                'password' => bcrypt(config('services.' . $provider . '.client_id')),
-                'provider_name' => $provider,
-                'provider_id' => $socialUser->getId(),
-                'avatar' => $socialUser->getAvatar(),
-            ]);
-        }
+        if (isset($socialUser->data) && count($socialUser->data)==1) {
+            \Auth::loginUsingId($socialUser->data[0]->id);
 
-        Auth::guard($this->getGuard())->login($userFromDatabase);
+            return $this->authenticated($request, $this->guard()->user())
+                ?: redirect()->intended($this->redirectPath());
+        } else throw new \Exception('Erro na busca');
 
-        if ($this->cache->has(md5($_SERVER['REMOTE_ADDR'])))
-            return redirect($this->cache->get(md5($_SERVER['REMOTE_ADDR'])));
-        else
-            return redirect($this->redirectPath());
+//        if ($this->cache->has(md5($_SERVER['REMOTE_ADDR'])))
+//            return redirect($this->cache->get(md5($_SERVER['REMOTE_ADDR'])));
+//        else
+//            return redirect($this->redirectPath());
     }
 }
