@@ -106,14 +106,43 @@ class SocialAuthController extends Controller
 
         if ($response->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
 
-        $socialUser = json_decode($response->getBody()->getContents());
+        $responseUser = json_decode($response->getBody()->getContents());
 
-        if (isset($socialUser->data) && count($socialUser->data)==1) {
-            \Auth::loginUsingId($socialUser->data[0]->id);
+        if (isset($responseUser->data) && count($responseUser->data)==1) {
+            \Auth::loginUsingId($responseUser->data[0]->id);
 
             return $this->authenticated($request, $this->guard()->user())
                 ?: redirect()->intended($this->redirectPath());
-        } else throw new \Exception('Erro na busca');
+        } elseif (isset($responseUser->data) && count($responseUser->data)==0)  {
+            $response2 = $this->guzzle->request('POST', config('erpnetSocialAuth.userApiUrl'), [
+                'debug' => false,
+                'form_params' => [
+                    'mandante' => 'ilhanet',
+                    'name' => $socialUser->name,
+                    'avatar' => $socialUser->avatar,
+                    'password' => bcrypt($socialUser->id),
+                    'username' => $socialUser->nickname,
+                    'email' => $socialUser->email,
+                    'provider' => $provider,
+                    'provider_id' => $socialUser->id,
+                ],
+                'headers' => [
+                    'Accept'     => config('erpnetSocialAuth.userApiHeader'),
+                ]
+            ]);
+
+            if ($response2->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
+
+            $responseUser2 = json_decode($response->getBody()->getContents());
+
+            dd($responseUser2);
+
+            \Auth::loginUsingId($responseUser2->data[0]->id);
+
+            return $this->authenticated($request, $this->guard()->user())
+                ?: redirect()->intended($this->redirectPath());
+
+        };
 
 //        if ($this->cache->has(md5($_SERVER['REMOTE_ADDR'])))
 //            return redirect($this->cache->get(md5($_SERVER['REMOTE_ADDR'])));
