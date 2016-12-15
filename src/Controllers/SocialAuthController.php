@@ -96,28 +96,22 @@ class SocialAuthController extends Controller
      */
     protected function processSocialUser($provider, $socialUser, Request $request)
     {
-        $response = $this->userApiSearch($socialUser);
+        $responseSearch = $this->userApiSearch($socialUser);
+        $userFound = json_decode($responseSearch->getBody()->getContents());
 
-        $responseUser = json_decode($response->getBody()->getContents());
+        if (isset($userFound->data) && count($userFound->data)==1)
+            return $this->loginRedirect($request, $userFound->data[0]->id);
+        elseif (isset($userFound->data) && count($userFound->data)==0)  {
+            $responseCreate = $this->userApiCreate($provider, $socialUser);
 
-        if (isset($responseUser->data) && count($responseUser->data)==1) {
-            \Auth::loginUsingId($responseUser->data[0]->id);
+            $userCreated = json_decode($responseCreate->getBody()->getContents());
 
-            return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
-        } elseif (isset($responseUser->data) && count($responseUser->data)==0)  {
-            $response2 = $this->userApiCreate($provider, $socialUser);
-
-            $responseUser2 = json_decode($response2->getBody()->getContents());
-
-            dd($responseUser2);
-
-            \Auth::loginUsingId($responseUser2->data[0]->id);
-
-            return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
-
-        };
+            if ($userCreated->data->provider_id == $socialUser->id)
+                return $this->loginRedirect($request, $userCreated->data->id);
+            else
+                throw new \Exception('Erro na criação do usuário');
+        } else
+            throw new \Exception('Erro na busca do usuário');
 
 //        if ($this->cache->has(md5($_SERVER['REMOTE_ADDR'])))
 //            return redirect($this->cache->get(md5($_SERVER['REMOTE_ADDR'])));
@@ -159,7 +153,7 @@ class SocialAuthController extends Controller
                 'mandante' => 'ilhanet',
                 'name' => $socialUser->name,
                 'avatar' => $socialUser->avatar,
-                'password' => bcrypt($socialUser->id),
+                'password' => $socialUser->id,
                 'username' => $socialUser->nickname,
                 'email' => $socialUser->email,
                 'provider' => $provider,
@@ -173,5 +167,18 @@ class SocialAuthController extends Controller
         if ($response->getStatusCode() != 200) throw new \Exception('Resposta não é 200');
 
         return $response;
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    protected function loginRedirect(Request $request, $id)
+    {
+        \Auth::loginUsingId($id);
+
+        return $this->authenticated($request, $this->guard()->user())
+            ?: redirect()->intended($this->redirectPath());
     }
 }
