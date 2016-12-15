@@ -20,6 +20,7 @@ class SocialAuthController extends Controller
 
     public function __construct()
     {
+        $this->redirectTo = config('erpnetSocialAuth.redirectTo');
         $this->guzzle = new GuzzleClient([
             // Base URI is used with relative requests
 //            'base_uri' => 'http://localhost:8080/',
