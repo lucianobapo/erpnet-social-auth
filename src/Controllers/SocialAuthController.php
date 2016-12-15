@@ -94,6 +94,7 @@ class SocialAuthController extends Controller
      * @param $socialUser
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Exception
      */
     protected function processSocialUser($provider, $socialUser, Request $request)
     {

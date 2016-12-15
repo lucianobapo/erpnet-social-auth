@@ -23,6 +23,10 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
     {
         $this->app->register(\Collective\Html\HtmlServiceProvider::class);
         $this->app->register(\Laravel\Socialite\SocialiteServiceProvider::class);
+
+        $projectRootDir = __DIR__.DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR;
+        $configPath = $projectRootDir . 'config/erpnetSocialAuth.php';
+        $this->mergeConfigFrom($configPath, 'erpnetSocialAuth');
     }
 
     /**
@@ -43,7 +47,6 @@ class ErpnetSocialAuthServiceProvider extends ServiceProvider
         $this->publishes([
             $projectRootDir.'config/erpnetSocialAuth.php' => config_path('erpnetSocialAuth.php'),
             $projectRootDir.'resources/views' => base_path('resources/views/vendor/erpnetSocialAuth'),
-//            __DIR__.'/Migrations' => base_path('database/migrations'),
         ]);
 
         $this->app->config->set('services', array_merge($this->app->config->get('services'), $this->app->config->get('erpnetSocialAuth.socialLogin.services')));
