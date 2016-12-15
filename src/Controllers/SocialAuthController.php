@@ -94,7 +94,7 @@ class SocialAuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    protected function processSocialUser($provider, $socialUser, Request $request, GuzzleClient $client)
+    protected function processSocialUser($provider, $socialUser, Request $request)
     {
         $response = $this->guzzle->request('GET', config('erpnetSocialAuth.userApiUrl'), [
             'debug' => false,
