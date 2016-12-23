@@ -1,5 +1,6 @@
 <?php
 return [
+    'mandante' => env('ERPNET_SOCIAL_AUTH_MANDANTE', 'ilhanet'),
     'redirectTo' => env('ERPNET_SOCIAL_AUTH_REDIRECT_TO', '/erpnet-api'),
     'userApiUrl' => env('ERPNET_SOCIAL_AUTH_USER_API_URL', 'http://localhost:8080/erpnet-api/user'),
     'userApiHeader' => 'application/x.erpnet.v1+json',

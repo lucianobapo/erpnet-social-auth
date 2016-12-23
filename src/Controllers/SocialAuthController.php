@@ -38,11 +38,9 @@ class SocialAuthController extends Controller
      */
     public function redirectToProvider($provider, Request $request)
     {
-        $args = $request->all();
-
-        if (isset($args['back']))
-            $this->cache->put(md5($_SERVER['REMOTE_ADDR']), $args['back'], 5);
-//            $request->cookie('back', $args['back']);
+        if (session()->has("_previous")){
+            session()->put('back', session("_previous")['url']);
+        }
 
         return $this->callSocialiteDriver($provider)->redirect();
     }
@@ -152,7 +150,7 @@ class SocialAuthController extends Controller
         $response = $this->guzzle->request('POST', config('erpnetSocialAuth.userApiUrl'), [
             'debug' => false,
             'form_params' => [
-                'mandante' => 'ilhanet',
+                'mandante' => config('erpnetSocialAuth.mandante'),
                 'name' => $socialUser->name,
                 'avatar' => $socialUser->avatar,
                 'password' => $socialUser->id,
@@ -181,6 +179,6 @@ class SocialAuthController extends Controller
         \Auth::loginUsingId($id);
 
         return $this->authenticated($request, $this->guard()->user())
-            ?: redirect()->intended($this->redirectPath());
+            ?: redirect()->intended(session()->has("back")?session("back"):$this->redirectPath());
     }
 }
